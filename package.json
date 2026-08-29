@@ -1,0 +1,47 @@
+{
+  "name": "iBibliotheque",
+  "version": "1.0.0",
+  "description": "Application de gestion de bibliothèque personnelle (recherche, catalogue, ajout, emprunts)",
+  "main": "main.js",
+  "author": "Basile BARGIBANT",
+  "license": "MIT",
+  "private": true,
+  "build": {
+    "appId": "com.bargistudio.ibibliotheque",
+    "productName": "iBibliotheque",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "src/**/*",
+      "data/**/*",
+      "Icon.png",
+      "package.json"
+    ],
+    "mac": {
+      "sign": false,
+      "icon": "Icon.png",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "icon": "Icon.png",
+      "target": [
+        "nsis"
+      ]
+    }
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder -m",
+    "build:win": "electron-builder -w"
+  },
+  "devDependencies": {
+    "electron": "^44.0.0",
+    "electron-builder": "^26.15.3"
+  }
+}

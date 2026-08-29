@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+<title>iBibliothèque</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-crest">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 10c6-3 12-3 16 0v28c-4-3-10-3-16 0V10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M40 10c-6-3-12-3-16 0v28c4-3 10-3 16 0V10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M24 10v28" stroke="currentColor" stroke-width="1.4" stroke-dasharray="1 3.4"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>iBibliothèque</h1>
+        <p class="brand-sub"><span id="stat-total">0</span> ouvrages catalogués</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item is-active" data-page="recherche">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M20 20L15.2 15.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Rechercher</span>
+      </button>
+      <button class="nav-item" data-page="explorer">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 4h5.5c.8 0 1.5.7 1.5 1.5v13c0 .8-.7 1.5-1.5 1.5H13V4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span>Explorer</span>
+      </button>
+      <button class="nav-item" data-page="ajouter">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Ajouter</span>
+      </button>
+      <button class="nav-item" data-page="emprunts">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 3.5h12v17l-6-3.5-6 3.5v-17Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <span>Emprunts</span>
+        <span class="nav-badge" id="badge-emprunts" hidden>0</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- ============ CONTENU ============ -->
+  <main class="content">
+
+    <!-- ---------- PAGE 1 : RECHERCHE ---------- -->
+    <section class="page is-active" id="page-recherche" data-page="recherche">
+      <header class="page-header">
+        <h2>Rechercher un ouvrage</h2>
+        <p class="page-sub">Par titre, auteur, éditeur, ISBN, emplacement ou étiquette.</p>
+      </header>
+
+      <div class="search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M20 20L15.2 15.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input type="text" id="search-input" placeholder="Rechercher…" autocomplete="off" />
+        <select id="search-champ">
+          <option value="tous">Tous les champs</option>
+          <option value="titre">Titre</option>
+          <option value="auteur">Auteur</option>
+          <option value="editeur">Éditeur</option>
+          <option value="isbn">ISBN</option>
+          <option value="emplacement">Emplacement</option>
+        </select>
+      </div>
+
+      <div class="tag-filter-row">
+        <span class="tag-filter-label">Étiquettes&nbsp;:</span>
+        <div id="search-tag-chips" class="chip-row"></div>
+        <button id="clear-tag-filter" class="link-btn" hidden>Réinitialiser</button>
+      </div>
+
+      <div class="results-meta">
+        <span id="results-count">0 résultat</span>
+      </div>
+
+      <div id="search-results" class="book-grid"></div>
+    </section>
+
+    <!-- ---------- PAGE 2 : EXPLORER ---------- -->
+    <section class="page" id="page-explorer" data-page="explorer">
+      <header class="page-header">
+        <h2>Explorer le catalogue</h2>
+        <p class="page-sub">Vue d'ensemble de tous les livres. Cliquez sur une ligne pour voir le détail et attribuer des étiquettes.</p>
+      </header>
+
+      <div class="explorer-toolbar">
+        <input type="text" id="explorer-filter" placeholder="Filtrer la liste…" autocomplete="off" />
+        <span id="explorer-count" class="explorer-count">0 livres</span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="book-table" id="explorer-table">
+          <thead>
+            <tr>
+              <th data-sort="titre">Titre</th>
+              <th data-sort="auteur">Auteur</th>
+              <th data-sort="editeur">Éditeur</th>
+              <th data-sort="annee">Année</th>
+              <th data-sort="emplacement">Emplacement</th>
+              <th data-sort="etiquettes">Étiquettes</th>
+              <th data-sort="statut">Statut</th>
+            </tr>
+          </thead>
+          <tbody id="explorer-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- PAGE 3 : AJOUTER ---------- -->
+    <section class="page" id="page-ajouter" data-page="ajouter">
+      <header class="page-header">
+        <h2>Ajouter à la bibliothèque</h2>
+        <p class="page-sub">Enregistrez un ouvrage à la main, ou importez depuis l'appli mobile iBibliothèque</p>
+      </header>
+
+      <div class="two-col">
+        <form class="card-paper form-card" id="add-form">
+          <h3>Nouveau livre</h3>
+
+          <label>Titre <span class="required">*</span>
+            <input type="text" id="f-titre" required placeholder="Le Comte de Monte-Cristo" />
+          </label>
+
+          <div class="field-row">
+            <label>Auteur
+              <input type="text" id="f-auteur" placeholder="Dumas, Alexandre" />
+            </label>
+            <label>Éditeur
+              <input type="text" id="f-editeur" placeholder="Gallimard (Paris)" />
+            </label>
+          </div>
+
+          <div class="field-row">
+            <label>Année
+              <input type="text" id="f-annee" placeholder="2020" inputmode="numeric" />
+            </label>
+            <label>ISBN
+              <input type="text" id="f-isbn" placeholder="9782070xxxxxx" />
+            </label>
+          </div>
+
+          <div class="field-row">
+            <label>Meuble
+              <input type="text" id="f-meuble" placeholder="Bibliothèque bureau maman" />
+            </label>
+            <label>Étagère
+              <input type="text" id="f-etagere" placeholder="3" />
+            </label>
+          </div>
+
+          <label>Étiquettes <span class="hint">(séparées par des virgules)</span>
+            <input type="text" id="f-etiquettes" list="tag-suggestions" placeholder="roman, jeunesse, coup de cœur" />
+          </label>
+          <datalist id="tag-suggestions"></datalist>
+
+          <button type="submit" class="btn btn-brass">Ajouter le livre</button>
+          <p class="form-feedback" id="add-feedback"></p>
+        </form>
+
+        <div class="card-paper import-card">
+          <h3>Importer un fichier CSV</h3>
+          <p>Le fichier doit contenir les colonnes <code>Titre</code>, <code>Auteur</code>, <code>Éditeur</code>, <code>Année</code>, <code>ISBN</code>, <code>Meuble</code>, <code>Étagère</code>, <code>Date d'ajout</code>, séparées par des points-virgules.</p>
+          <p>Les livres déjà présents (même ISBN, ou même titre et auteur) sont automatiquement ignorés.</p>
+          <button id="import-csv-btn" class="btn btn-outline">Choisir un fichier CSV…</button>
+          <p class="form-feedback" id="import-feedback"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PAGE 4 : EMPRUNTS ---------- -->
+    <section class="page" id="page-emprunts" data-page="emprunts">
+      <header class="page-header">
+        <h2>Livres empruntés</h2>
+        <p class="page-sub">Suivi des ouvrages actuellement prêtés.</p>
+      </header>
+
+      <div id="emprunts-empty" class="empty-state" hidden>
+        <p>Aucun livre n'est actuellement emprunté.</p>
+      </div>
+
+      <div id="emprunts-list" class="borrow-list"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ MODALE DÉTAIL LIVRE ============ -->
+<div class="modal-overlay hidden" id="detail-modal">
+  <div class="modal card-paper" role="dialog" aria-modal="true">
+    <button class="modal-close" id="detail-close" aria-label="Fermer">&times;</button>
+    <div class="modal-stamp" id="detail-stamp" hidden>EMPRUNTÉ</div>
+
+    <h3 id="detail-titre">Titre du livre</h3>
+    <p class="modal-auteur" id="detail-auteur">Auteur</p>
+
+    <dl class="modal-meta">
+      <div><dt>Éditeur</dt><dd id="detail-editeur">—</dd></div>
+      <div><dt>Année</dt><dd id="detail-annee">—</dd></div>
+      <div><dt>ISBN</dt><dd id="detail-isbn">—</dd></div>
+      <div><dt>Emplacement</dt><dd id="detail-emplacement">—</dd></div>
+      <div><dt>Ajouté le</dt><dd id="detail-date">—</dd></div>
+    </dl>
+
+    <div class="modal-emprunt-info" id="detail-emprunt-info" hidden></div>
+
+    <div class="modal-tags-section">
+      <h4>Étiquettes</h4>
+      <div class="chip-row" id="detail-tags"></div>
+      <div class="tag-add-row">
+        <input type="text" id="detail-tag-input" list="tag-suggestions" placeholder="Ajouter une étiquette…" />
+        <button id="detail-tag-add" class="btn btn-outline btn-sm">Ajouter</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button id="detail-borrow-btn" class="btn btn-brass">Emprunter ce livre</button>
+      <button id="detail-return-btn" class="btn btn-outline" hidden>Marquer comme retourné</button>
+      <button id="detail-delete-btn" class="btn btn-ghost-danger">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODALE EMPRUNT ============ -->
+<div class="modal-overlay hidden" id="borrow-modal">
+  <div class="modal card-paper modal-small" role="dialog" aria-modal="true">
+    <button class="modal-close" id="borrow-close" aria-label="Fermer">&times;</button>
+    <h3>Emprunter le livre</h3>
+    <p class="modal-borrow-title" id="borrow-book-title"></p>
+
+    <label>Nom de l'emprunteur
+      <input type="text" id="borrow-name" placeholder="Ex. Camille" />
+    </label>
+    <label>Date de retour prévue <span class="hint">(optionnel)</span>
+      <input type="date" id="borrow-due-date" />
+    </label>
+
+    <div class="modal-actions">
+      <button id="borrow-confirm" class="btn btn-brass">Confirmer l'emprunt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ NOTIFICATION ============ -->
+<div class="toast hidden" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
